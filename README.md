@@ -24,10 +24,16 @@
 ---
 ## Security Properties
 
-- **Mutual Authentication:** Each party verifies the identity of the peer using RSA-PSS signatures.
-- **Forward Secrecy:** Compromise of long-term RSA keys does not compromise past session keys.
-- **Confidentiality:** Application data is protected using authenticated encryption.
-- **Integrity:** Modification of encrypted data is detected by AEAD authentication tags.
+ Integrity -> Ensure that the message has not been tampered with  
+- Confidentiality -> Only the intended recipient can read the message  
+- Authenticity -> Proves one's identity  
+- Non-Repudiation -> Sender is unable to refute that a message was sent by them  
+- Replay Protection -> Prevents attackers from using old messages as a way of decrypting the new messages  
+- Forward Secrecy -> Keys continue to stay secure even after repeated usage  
+
+Resistant against: 
+- Man-In-The-Middle Attacks  
+- Side-Channel Attacks  
 ---
 ## Threat Model and Assumptions
 
