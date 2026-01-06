@@ -1,4 +1,4 @@
-# RSA-Signed Ephemeral ECDH (RSE-ECDH)
+# RSA-Signed Ephemeral ECDH
 
 ## Overview
 
