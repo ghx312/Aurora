@@ -27,13 +27,11 @@
  Integrity -> Ensure that the message has not been tampered with  
 - Confidentiality -> Only the intended recipient can read the message  
 - Authenticity -> Proves one's identity  
-- Non-Repudiation -> Sender is unable to refute that a message was sent by them  
 - Replay Protection -> Prevents attackers from using old messages as a way of decrypting the new messages  
 - Forward Secrecy -> Keys continue to stay secure even after repeated usage  
 
 Resistant against: 
 - Man-In-The-Middle Attacks  
-- Side-Channel Attacks  
 ---
 ## Threat Model and Assumptions
 
