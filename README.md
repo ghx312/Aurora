@@ -24,7 +24,7 @@
 ---
 ## Security Properties
 
- Integrity -> Ensure that the message has not been tampered with  
+- Integrity -> Ensure that the message has not been tampered with  
 - Confidentiality -> Only the intended recipient can read the message  
 - Authenticity -> Proves one's identity  
 - Replay Protection -> Prevents attackers from using old messages as a way of decrypting the new messages  
