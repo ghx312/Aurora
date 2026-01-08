@@ -1,7 +1,5 @@
 # RSA-Signed Ephemeral ECDH
 
-## Overview
-
 ---
 ## Cryptographic Primitives
 
@@ -10,16 +8,6 @@
 - **Key Derivation:** HKDF with SHA-256
 - **Symmetric Encryption:** AES-256-GCM (AEAD)
 - **Transport:** TCP
-
----
-## Protocol Overview
-
-1. Each party generates an ephemeral ECDH key pair for the session.
-2. ECDH public keys and protocol metadata are signed using long-term RSA-PSS identity keys.
-3. Signed ECDH public keys are exchanged and verified by both parties.
-4. A shared secret is computed using ECDH.
-5. Symmetric session keys are derived from the shared secret using HKDF-SHA256.
-6. Application data is encrypted and authenticated using AES-256-GCM.
 
 ---
 ## Security Properties
@@ -33,13 +21,8 @@
 Resistant against: 
 - Man-In-The-Middle Attacks  
 ---
-## Threat Model and Assumptions
-
-- The adversary has full control over the network (eavesdropping, modification, replay).
-- Long-term RSA private keys remain uncompromised during protocol execution.
-- Cryptographic primitives are assumed to be secure when used as specified.
-- Random number generation is assumed to be cryptographically secure.
----
 ## Disclaimer
 
+Not ready for comercial use, use at your own risk, for educational purposes only.
+Any vulnerabilities found, please send an email to wongpinrui2009@gmail.com
 ---
