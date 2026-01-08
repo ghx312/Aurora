@@ -23,7 +23,7 @@ Resistant against:
 ---
 ## Disclaimer
 
-Not ready for comercial use, use at your own risk, for educational purposes only.
+Not ready for comercial use, use at your own risk, for educational purposes only.  
 Any vulnerabilities found, please send an email to wongpinrui2009@gmail.com
 
 ---
