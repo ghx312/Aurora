@@ -19,10 +19,12 @@
 - Forward Secrecy -> Keys continue to stay secure even after repeated usage  
 
 Resistant against: 
-- Man-In-The-Middle Attacks  
+- Man-In-The-Middle Attacks
+
 ---
 ## Disclaimer
 
 Not ready for comercial use, use at your own risk, for educational purposes only.
 Any vulnerabilities found, please send an email to wongpinrui2009@gmail.com
+
 ---
