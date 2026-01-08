@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#include <conio.h>
 #include "Header.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -17,14 +18,21 @@ using std::endl;
 /*
 README.md
 -------------------------------------------------------------------
-Please recompile the program before running it
+On actual day, please recompile the program before running it
 g++ Host_Side.cpp Encryption_Protocol.cpp -o Host_Side.exe -lws2_32
 g++ Client_Side.cpp Encryption_Protocol.cpp -o Client_Side.exe -lws2_32
+
+VSC Terminal:
+.\Host_Side.exe
+
+CMD/Second Computer:
+cd C:\Users\wongp\Documents\Programming\Projects\Encrypted_Messaging -> Depending on other computer's directory
+Client_Side.exe
 */
 
 std::mutex output_mutex;
+std::mutex input_mutex;
 string current_input;
-std::atomic<bool> is_typing(false);
 
 int main() {
     WSADATA wsaData;
@@ -40,7 +48,7 @@ int main() {
     bind(serverSock, (sockaddr*)&serverAddr, sizeof(serverAddr));
     listen(serverSock, SOMAXCONN);
 
-    cout << "Listening...\n";
+    cout << "Connecting to Client...\n";
 
     sockaddr_in clientAddr{};
     int clientSize = sizeof(clientAddr);
@@ -48,9 +56,10 @@ int main() {
 
     cout << "Connected to Client!\n";
 
-    key_exchange();
-
     string key = "Secret_Key";
+    string init_msg = initialising();
+    cout << init_msg << endl;
+
     std::atomic<bool> running(true);
     std::atomic<bool> remote_quit(false);
 
@@ -83,15 +92,24 @@ int main() {
             }
             
             {
-                std::lock_guard<std::mutex> lock(output_mutex);
+                std::lock_guard<std::mutex> output_lock(output_mutex);
+                std::lock_guard<std::mutex> input_lock(input_mutex);
+                
                 string saved_input = current_input;
+                
                 cout << "\r";
-                for (size_t i = 0; i < current_input.length() + 6; i++) {
+                for (size_t i = 0; i < saved_input.length() + 6; i++) {
                     cout << " ";
                 }
                 cout << "\r";
+                
                 cout << "Client: " << decrypted << endl;
-                cout << "Host: " << saved_input << std::flush;
+                
+                if (!saved_input.empty()) {
+                    cout << "Host: " << saved_input << std::flush;
+                } else {
+                    cout << "Host: " << std::flush;
+                }
             }
         }
     });
@@ -100,18 +118,52 @@ int main() {
         cout << "Host: " << std::flush;
         while (running) {
             string msg;
+            char ch;
             
             {
-                std::lock_guard<std::mutex> lock(output_mutex);
+                std::lock_guard<std::mutex> lock(input_mutex);
                 current_input.clear();
             }
             
-            is_typing = true;
-            getline(cin, msg);
-            is_typing = false;
+            while (running) {
+                if (_kbhit()) {
+                    ch = _getch();
+                    
+                    if (ch == '\r') {
+                        cout << endl;
+                        break;
+                    } else if (ch == '\b') {
+                        if (!msg.empty()) {
+                            msg.pop_back();
+                            std::lock_guard<std::mutex> lock(input_mutex);
+                            current_input = msg;
+                            
+                            std::lock_guard<std::mutex> output_lock(output_mutex);
+                            cout << "\r";
+                            for (size_t i = 0; i < msg.length() + 10; i++) {
+                                cout << " ";
+                            }
+                            cout << "\rHost: " << msg << std::flush;
+                        }
+                    } else if (ch >= 32 && ch <= 126) {
+                        msg += ch;
+                        std::lock_guard<std::mutex> lock(input_mutex);
+                        current_input = msg;
+                        
+                        std::lock_guard<std::mutex> output_lock(output_mutex);
+                        cout << ch << std::flush;
+                    }
+                }
+                Sleep(10);
+            }
             
             if (!running) {
                 break;
+            }
+            
+            {
+                std::lock_guard<std::mutex> lock(input_mutex);
+                current_input.clear();
             }
             
             string encrypted = encrypt_message(msg, key);
@@ -124,7 +176,7 @@ int main() {
             if (msg == "QUIT") {
                 running = false;
                 shutdown(clientSock, SD_SEND); 
-                cout << "You have disconnected. Press enter to quit the programme.";
+                cout << "Press enter to exit.";
                 break;
             }
             
