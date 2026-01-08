@@ -21,6 +21,10 @@ Resistant against:
 - Man-In-The-Middle Attacks
 
 ---
+## Dependencies
+C++ Compiler (Within VSC and/or Terminal)
+
+---
 ## Disclaimer
 
 Not ready for comercial use, use at your own risk, for educational purposes only.  
