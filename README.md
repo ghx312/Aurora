@@ -1,6 +1,5 @@
 # RSA-Signed Ephemeral ECDH
 
----
 ## Cryptographic Primitives
 
 - **Key Exchange:** Ephemeral Elliptic Curve Diffie–Hellman (ECDH)
