@@ -22,7 +22,9 @@ Resistant against:
 
 ---
 ## Dependencies
-C++ Compiler (Within VSC and/or Terminal)
+C++ Compiler (g++ 9.0+ or MSVC with C++17 support)
+OpenSSL
+libsodium
 
 ---
 ## Disclaimer
