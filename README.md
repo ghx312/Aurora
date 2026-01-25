@@ -1,5 +1,4 @@
-# Aurora (Incomplete)
-***
+# Aurora (Incomplete)  
 ## Description
 - Aurora is an end-to-end encryption messaging service designed to guarantee confidentiality and authenticity by using modern cryptographic primitives
 - It ensures that all messages are resistant to tampering and unauthorised access, allowing for private and secure communication.
