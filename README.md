@@ -1,4 +1,9 @@
-# RSA-Signed Ephemeral ECDH (Incomplete)
+# Aurora (Incomplete)
+***
+## Description
+- Aurora is an end-to-end encryption messaging service designed to guarantee confidentiality and authenticity by using modern cryptographic primitives
+- It ensures that all messages are resistant to tampering and unauthorised access, allowing for private and secure communication.
+- Aurora does not retain any user information, messaging history, or metadata.
 
 ## Cryptographic Primitives
 
@@ -27,9 +32,7 @@ OpenSSL
 libsodium
 
 ---
-## Disclaimer
-
-Not ready for comercial use, use at your own risk, for educational purposes only.  
+## Disclaimer  
+Aurora is intended for research and educational purposes only. Use at your own risk.
 Any vulnerabilities found, please send an email to wongpinrui2009@gmail.com
-
----
+***
