@@ -2,6 +2,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <vector>
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
@@ -12,23 +13,9 @@
 
 using std::cout;
 using std::cin;
+using std::vector;
 using std::string;
 using std::endl;
-
-/*
-README.md
--------------------------------------------------------------------
-On actual day, please recompile the program before running it
-g++ Host_Side.cpp Encryption_Protocol.cpp -o Host_Side.exe -lws2_32
-g++ Client_Side.cpp Encryption_Protocol.cpp -o Client_Side.exe -lws2_32
-
-VSC Terminal:
-.\Host_Side.exe
-
-CMD/Second Computer:
-cd C:\Users\wongp\Documents\Programming\Projects\Encrypted_Messaging -> Depending on other computer's directory
-Client_Side.exe
-*/
 
 std::mutex output_mutex;
 std::mutex input_mutex;
@@ -39,32 +26,58 @@ int main() {
     WSAStartup(MAKEWORD(2,2), &wsaData);
 
     SOCKET serverSock = socket(AF_INET, SOCK_STREAM, 0);
+    if (serverSock == INVALID_SOCKET) {
+        cout << "Failed to create socket! Error: " << WSAGetLastError() << endl;
+        WSACleanup();
+        cin.get();
+        return 1;
+    }
 
     sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(8080);
     serverAddr.sin_addr.s_addr = INADDR_ANY;
 
-    bind(serverSock, (sockaddr*)&serverAddr, sizeof(serverAddr));
+    if (bind(serverSock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+        cout << "Failed to bind socket! Error: " << WSAGetLastError() << endl;
+        cout << "Port 8080 may be in use. Press enter to exit." << endl;
+        closesocket(serverSock);
+        WSACleanup();
+        cin.get();
+        return 1;
+    }
+    
     listen(serverSock, SOMAXCONN);
-
-    cout << "Connecting to Client...\n";
 
     sockaddr_in clientAddr{};
     int clientSize = sizeof(clientAddr);
     SOCKET clientSock = accept(serverSock, (sockaddr*)&clientAddr, &clientSize);
+    
+    if (clientSock == INVALID_SOCKET) {
+        cout << "Failed to accept connection! Error: " << WSAGetLastError() << endl;
+        closesocket(serverSock);
+        WSACleanup();
+        cin.get();
+        return 1;
+    }
 
-    cout << "Connected to Client!\n";
+    vector<unsigned char> Shared_Key = Initialisation(clientSock, true);
 
-    string key = "Secret_Key";
-    string init_msg = initialising();
-    cout << init_msg << endl;
+    cout << "\n";
+    cout << "                                    \n";
+    cout << "     /\\                             \n";
+    cout << "    /  \\  _   _ _ __ ___  _ __ __ _ \n";
+    cout << "   / /\\ \\| | | | '__/ _ \\| '__/ _` |\n";
+    cout << "  / ____ \\ |_| | | | (_) | | | (_| |\n";
+    cout << " /_/    \\_\\__,_|_|  \\___/|_|  \\__,_|\n";
+    cout << " Enter \"QUIT\" to quit \n";
+    cout << "\n";
 
     std::atomic<bool> running(true);
     std::atomic<bool> remote_quit(false);
 
     std::thread receiver([&]() {
-        char buffer[1024];
+        char buffer[4096];
         while (running) {
             int bytesReceived = recv(clientSock, buffer, sizeof(buffer), 0);
             if (bytesReceived <= 0) { 
@@ -72,8 +85,8 @@ int main() {
                 remote_quit = true;
                 break; 
             }
-            string ciphertext(buffer, bytesReceived);
-            string decrypted = decrypt_message(ciphertext, key);
+            vector<unsigned char> ciphertext(buffer, buffer + bytesReceived);
+            string decrypted = AES_GCM_256_Decryption(ciphertext, Shared_Key);
             
             if (decrypted == "QUIT") { 
                 running = false;
@@ -166,8 +179,8 @@ int main() {
                 current_input.clear();
             }
             
-            string encrypted = encrypt_message(msg, key);
-            int sent = send(clientSock, encrypted.c_str(), encrypted.size(), 0);
+            vector<unsigned char> encrypted = AES_GCM_256_Encryption(msg, Shared_Key);
+            int sent = send(clientSock, (char*)encrypted.data(), encrypted.size(), 0);
             if (sent == SOCKET_ERROR) {
                 running = false;
                 break;
