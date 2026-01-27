@@ -5,6 +5,7 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include <windows.h>
+#include <vector>
 #include <conio.h>
 #include "Header.h"
 
@@ -14,23 +15,8 @@ using std::cout;
 using std::cin;
 using std::string;
 using std::endl;
-
-/*
-README.md
--------------------------------------------------------------------
-On actual day, please recompile the program before running it
-g++ Host_Side.cpp Encryption_Protocol.cpp -o Host_Side.exe -lws2_32
-g++ Client_Side.cpp Encryption_Protocol.cpp -o Client_Side.exe -lws2_32
-
-VSC Terminal:
-.\Host_Side.exe
-
-CMD/Second Computer:
-cd C:\Users\wongp\Documents\Programming\Projects\Encrypted_Messaging -> Depending on other computer's directory
-Client_Side.exe
-
-Computers requires C++ to be downloaded, fix school computer
-*/
+using std::vector;
+using std::atomic;
 
 std::mutex output_mutex;
 std::mutex input_mutex;
@@ -41,33 +27,46 @@ int main() {
     WSAStartup(MAKEWORD(2,2), &wsaData);
 
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == INVALID_SOCKET) {
+        cout << "Failed to create socket! Error: " << WSAGetLastError() << endl;
+        WSACleanup();
+        cin.get();
+        return 1;
+    }
 
     sockaddr_in serverAddr{};
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_port = htons(8080);
     inet_pton(AF_INET, "127.0.0.1", &serverAddr.sin_addr);
 
-    cout << "Connecting to Host...\n";
     if (connect(sock, (sockaddr*)&serverAddr, sizeof(serverAddr)) == SOCKET_ERROR) {
+        int error = WSAGetLastError();
         cout << "Failed to connect to Host!\n";
+        cout << "Error code: " << error << endl;
         cout << "Press enter to exit." << endl;
         closesocket(sock);
         WSACleanup();
         cin.get();
         return 1;
     }
+    
+    vector<unsigned char> Shared_Key = Initialisation(sock, false);
 
-    cout << "Connected to Host!\n";
-
-    string key = "Secret_Key";
-    string init_msg = initialising();
-    cout << init_msg << endl;
+    cout << "\n";
+    cout << "                                    \n";
+    cout << "     /\\                             \n";
+    cout << "    /  \\  _   _ _ __ ___  _ __ __ _ \n";
+    cout << "   / /\\ \\| | | | '__/ _ \\| '__/ _` |\n";
+    cout << "  / ____ \\ |_| | | | (_) | | | (_| |\n";
+    cout << " /_/    \\_\\__,_|_|  \\___/|_|  \\__,_|\n";
+    cout << " Enter \"QUIT\" to quit \n";
+    cout << "\n";
 
     std::atomic<bool> running(true);
     std::atomic<bool> remote_quit(false);
 
     std::thread receiver([&]() {
-        char buffer[1024];
+        char buffer[4096];
         while (running) {
             int bytesReceived = recv(sock, buffer, sizeof(buffer), 0);
             if (bytesReceived <= 0) { 
@@ -75,8 +74,8 @@ int main() {
                 remote_quit = true;
                 break; 
             }
-            string ciphertext(buffer, bytesReceived);
-            string decrypted = decrypt_message(ciphertext, key);
+            vector<unsigned char> ciphertext(buffer, buffer + bytesReceived);
+            string decrypted = AES_GCM_256_Decryption(ciphertext, Shared_Key);
             
             if (decrypted == "QUIT") { 
                 running = false;
@@ -169,8 +168,8 @@ int main() {
                 current_input.clear();
             }
             
-            string encrypted = encrypt_message(msg, key);
-            int sent = send(sock, encrypted.c_str(), encrypted.size(), 0);
+            vector<unsigned char> encrypted = AES_GCM_256_Encryption(msg, Shared_Key);
+            int sent = send(sock, (char*)encrypted.data(), encrypted.size(), 0);
             if (sent == SOCKET_ERROR) {
                 running = false;
                 break;
