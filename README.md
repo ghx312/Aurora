@@ -26,8 +26,8 @@ OpenSSL
 libsodium  
 ***
 ### Compile Command
-g++ Host\*Side.cpp Encryption\*Protocol.cpp -o Host\*Side.exe -lws2\*32 -lssl -lcrypto -lsodium  
-g++ Client\*Side.cpp Encryption\*Protocol.cpp -o Client\*Side.exe -lws2\*32 -lssl -lcrypto -lsodium  
+g++ Host_Side.cpp Encryption_Protocol.cpp -o Host_Side.exe -lws2_32 -lssl -lcrypto -lsodium  
+g++ Client_Side.cpp Encryption_Protocol.cpp -o Client_Side.exe -lws2_32 -lssl -lcrypto -lsodium  
 ***
 ## Disclaimer  
 Aurora is intended for research and educational purposes only. Use at your own risk.  
