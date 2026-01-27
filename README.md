@@ -25,6 +25,10 @@ C++ Compiler (g++ 9.0+ or MSVC with C++17 support)
 OpenSSL  
 libsodium  
 ***
+### Compile Command
+g++ Host*Side.cpp Encryption*Protocol.cpp -o Host*Side.exe -lws2*32 -lssl -lcrypto -lsodium
+g++ Client*Side.cpp Encryption*Protocol.cpp -o Client*Side.exe -lws2*32 -lssl -lcrypto -lsodium
+***
 ## Disclaimer  
 Aurora is intended for research and educational purposes only. Use at your own risk.  
 For any additional queries or remarks, please send an email to wongpinrui2009@gmail.com  
