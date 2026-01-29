@@ -5,7 +5,7 @@
 - Aurora does not retain any user information, messaging history, or metadata.
 ## Cryptographic Primitives
 - **Key Exchange:** Ephemeral Elliptic Curve Diffie–Hellman (ECDH)  
-- **Authentication:** RSA-PSS signatures with SHA-256  
+- **Authentication:** ECDSA  
 - **Key Derivation:** HKDF with SHA-256  
 - **Symmetric Encryption:** AES-256-GCM (AEAD)  
 - **Transport:** TCP  
